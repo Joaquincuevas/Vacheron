@@ -104,6 +104,43 @@ button {
   transform: translateY(-14px);
 }
 
+/* ------------------------------------------------------ grid categorías */
+
+.grid {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--s-3);
+  padding: var(--s-2) var(--s-5) var(--s-5);
+}
+
+.cat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s-4);
+  min-height: 96px;
+  padding: var(--s-4);
+  border-radius: var(--radius);
+  text-align: left;
+  /* Un susurro del tono propio sobre la misma superficie que el resto:
+     distingue sin convertir el grid en un semáforo. */
+  background: color-mix(in oklch, var(--cat-tone) 9%, var(--surface-1));
+}
+
+.cat__icon {
+  display: flex;
+  color: var(--cat-tone);
+}
+
+.cat__label {
+  font-size: var(--step-0);
+  font-weight: 500;
+  letter-spacing: -0.012em;
+  color: var(--text);
+}
+
 /* ----------------------------------------------------------- vista monto */
 
 .chip {
