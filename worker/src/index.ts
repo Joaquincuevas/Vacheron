@@ -1,8 +1,10 @@
-import { Hono } from 'hono';
+import { Hono, type Context } from 'hono';
 import { cors } from 'hono/cors';
+import type { ContentfulStatusCode } from 'hono/utils/http-status';
 import type { ApiError, ExpenseArchived, ExpenseCreated } from '../../shared/types';
 import { expenseSchema, formatIssues, normalizeExpense, pageIdSchema } from './schema';
 import { NotionClient } from './notion';
+import { toAppError } from './errors';
 
 export interface Env {
   NOTION_TOKEN: string;
@@ -60,11 +62,7 @@ app.post('/api/expense', async (c) => {
     const pageId = await notionFor(c.env).createExpense(expense);
     return c.json<ExpenseCreated>({ ok: true, pageId });
   } catch (err) {
-    console.error('createExpense', err);
-    return c.json<ApiError>(
-      { ok: false, error: { code: 'notion_error', message: messageOf(err) } },
-      502,
-    );
+    return fail(c, err, 'createExpense');
   }
 });
 
@@ -81,11 +79,7 @@ app.delete('/api/expense/:pageId', async (c) => {
     await notionFor(c.env).trashPage(parsed.data);
     return c.json<ExpenseArchived>({ ok: true, pageId: parsed.data, archived: true });
   } catch (err) {
-    console.error('trashPage', err);
-    return c.json<ApiError>(
-      { ok: false, error: { code: 'notion_error', message: messageOf(err) } },
-      502,
-    );
+    return fail(c, err, 'trashPage');
   }
 });
 
@@ -93,8 +87,11 @@ function notionFor(env: Env): NotionClient {
   return new NotionClient({ token: env.NOTION_TOKEN, dataSourceId: env.NOTION_DATA_SOURCE_ID });
 }
 
-function messageOf(err: unknown): string {
-  return err instanceof Error ? err.message : 'Error desconocido llamando a Notion';
+/** Único punto donde un throw se convierte en respuesta. */
+function fail(c: Context<{ Bindings: Env }>, err: unknown, where: string) {
+  const appError = toAppError(err);
+  console.error(where, appError.code, appError.message, appError.cause ?? '');
+  return c.json(appError.toResponseBody(), appError.status as ContentfulStatusCode);
 }
 
 app.notFound((c) =>
