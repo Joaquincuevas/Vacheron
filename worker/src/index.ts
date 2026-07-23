@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import type { ApiError } from '../../shared/types';
+import { expenseSchema, formatIssues, normalizeExpense } from './schema';
 
 export interface Env {
   NOTION_TOKEN: string;
@@ -32,6 +33,37 @@ app.use('/api/*', (c, next) => {
 });
 
 app.get('/api/health', (c) => c.json({ ok: true, service: 'vacheron-api' }));
+
+app.post('/api/expense', async (c) => {
+  let raw: unknown;
+  try {
+    raw = await c.req.json();
+  } catch {
+    return c.json<ApiError>(
+      { ok: false, error: { code: 'invalid_request', message: 'Body JSON inválido' } },
+      400,
+    );
+  }
+
+  const parsed = expenseSchema.safeParse(raw);
+  if (!parsed.success) {
+    return c.json<ApiError>(
+      { ok: false, error: { code: 'invalid_request', message: formatIssues(parsed.error) } },
+      400,
+    );
+  }
+
+  const expense = normalizeExpense(parsed.data);
+  console.log('expense validado', expense);
+
+  return c.json<ApiError>(
+    {
+      ok: false,
+      error: { code: 'upstream_unavailable', message: 'Cliente de Notion aún no conectado' },
+    },
+    503,
+  );
+});
 
 app.notFound((c) =>
   c.json<ApiError>(
