@@ -3,10 +3,44 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#17150f" />
     <title>Gasto</title>
     <script type="module" src="/src/main.ts"></script>
   </head>
   <body>
-    <div id="app"></div>
+    <!--
+      El shell va estático en el HTML a propósito: pinta antes de que el módulo
+      se parsee, así abrir desde la pantalla de inicio no muestra un blanco.
+      main.ts solo le da comportamiento.
+    -->
+    <div class="app" id="app" data-view="pick">
+      <header class="topbar">
+        <div class="topbar__day">
+          <span class="topbar__label">Hoy</span>
+          <strong class="topbar__total" id="day-total">$0</strong>
+        </div>
+      </header>
+
+      <main class="stage">
+        <section class="view view--pick" id="view-pick" aria-label="Elegir categoría">
+          <div class="grid" id="category-grid"></div>
+          <section class="history" id="history"></section>
+        </section>
+
+        <section class="view view--amount" id="view-amount" aria-label="Ingresar monto">
+          <button class="chip pressable" id="chip-category" type="button">
+            <span class="chip__dot"></span>
+            <span id="chip-label">—</span>
+          </button>
+
+          <div class="amount" id="amount" data-empty="true" aria-live="polite">
+            <span class="amount__symbol">$</span><span id="amount-value">0</span>
+          </div>
+
+          <div class="note" id="note"></div>
+          <div class="keypad" id="keypad"></div>
+        </section>
+      </main>
+    </div>
   </body>
 </html>

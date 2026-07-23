@@ -1,0 +1,189 @@
+@import './tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--step-0);
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* ---------------------------------------------------------------- layout */
+
+.app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding: var(--s-4) var(--s-5) var(--s-3);
+}
+
+.topbar__day {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-3);
+}
+
+.topbar__label {
+  font-size: var(--step--1);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.topbar__total {
+  font-size: var(--step-1);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-dim);
+}
+
+/* El escenario ancla las dos vistas en el mismo espacio para que la
+   transición sea un cambio de estado y no un salto de layout. */
+.stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.view {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--dur) var(--ease),
+    transform var(--dur) var(--ease);
+}
+
+.app[data-view='pick'] .view--pick,
+.app[data-view='amount'] .view--amount {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+}
+
+.app[data-view='pick'] .view--amount {
+  transform: translateY(14px);
+}
+
+.app[data-view='amount'] .view--pick {
+  transform: translateY(-14px);
+}
+
+/* ----------------------------------------------------------- vista monto */
+
+.chip {
+  flex: none;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin-top: var(--s-2);
+  padding: var(--s-2) var(--s-4);
+  border-radius: var(--radius-pill);
+  background: var(--surface-1);
+  font-size: var(--step--1);
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  transition: background var(--dur-fast) var(--ease);
+}
+
+.chip__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--chip-tone, var(--accent));
+}
+
+.amount {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  min-height: 0;
+  font-size: var(--hero);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  transition: color var(--dur) var(--ease);
+}
+
+/* En cero el monto está presente pero apagado: invita sin gritar. */
+.amount[data-empty='true'] {
+  color: var(--text-faint);
+}
+
+.amount__symbol {
+  font-size: 0.5em;
+  font-weight: 500;
+  color: var(--text-faint);
+  align-self: center;
+  transform: translateY(-0.08em);
+}
+
+/* ----------------------------------------------------------- superficies */
+
+.surface {
+  background: var(--surface-1);
+  border-radius: var(--radius);
+}
+
+/* Feedback táctil: el elemento cede bajo el dedo. Sin sombras. */
+.pressable {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  transition:
+    transform var(--dur-fast) var(--ease),
+    background var(--dur-fast) var(--ease);
+}
+
+.pressable:active {
+  transform: scale(0.96);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

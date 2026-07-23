@@ -1,0 +1,75 @@
+/*
+ * Sistema de diseño.
+ *
+ * Dark-first con un solo acento (oro apagado). Las superficies se separan por
+ * luminancia, no por sombras ni bordes; la jerarquía la hace el tamaño y la
+ * opacidad del texto. El monto es el elemento más grande de la pantalla y nada
+ * compite con él.
+ */
+
+:root {
+  color-scheme: dark;
+
+  /* Superficies: elevación por luminancia. Base cálida, no gris neutro. */
+  --bg: oklch(0.155 0.006 85);
+  --surface-1: oklch(0.208 0.007 85);
+  --surface-2: oklch(0.262 0.009 85);
+  --surface-3: oklch(0.318 0.010 85);
+
+  /* Texto: tres niveles, suficiente para toda la jerarquía. */
+  --text: oklch(0.968 0.008 85);
+  --text-dim: oklch(0.735 0.012 85);
+  --text-faint: oklch(0.520 0.010 85);
+
+  /* Acento único. Todo lo accionable primario usa este color. */
+  --accent: oklch(0.815 0.115 85);
+  --accent-soft: oklch(0.815 0.115 85 / 0.14);
+  --accent-ink: oklch(0.20 0.030 85);
+
+  --danger: oklch(0.680 0.150 25);
+  --ok: oklch(0.760 0.130 152);
+
+  /* Tipografía del sistema: cero descarga, cero FOUT, se siente nativa. */
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui,
+    sans-serif;
+
+  /* Escala tipográfica. --step-0 = 16px: mínimo para que iOS no haga zoom. */
+  --step--1: 0.8125rem;
+  --step-0: 1rem;
+  --step-1: 1.1875rem;
+  --step-2: 1.5rem;
+  --step-3: 2rem;
+  --hero: clamp(3.5rem, 18vw, 4.75rem);
+
+  /* Espaciado en escala de 4. */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+
+  --radius-sm: 12px;
+  --radius: 18px;
+  --radius-lg: 26px;
+  --radius-pill: 999px;
+
+  /* Áreas seguras del iPhone. Ver el uso en app.css. */
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+
+  /* Curva de salida rápida: se siente iOS, no CSS por defecto. */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 140ms;
+  --dur: 240ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 1ms;
+    --dur: 1ms;
+  }
+}
