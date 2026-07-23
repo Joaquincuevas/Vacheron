@@ -1,7 +1,8 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import type { ApiError } from '../../shared/types';
-import { expenseSchema, formatIssues, normalizeExpense } from './schema';
+import type { ApiError, ExpenseArchived, ExpenseCreated } from '../../shared/types';
+import { expenseSchema, formatIssues, normalizeExpense, pageIdSchema } from './schema';
+import { NotionClient } from './notion';
 
 export interface Env {
   NOTION_TOKEN: string;
@@ -54,16 +55,47 @@ app.post('/api/expense', async (c) => {
   }
 
   const expense = normalizeExpense(parsed.data);
-  console.log('expense validado', expense);
 
-  return c.json<ApiError>(
-    {
-      ok: false,
-      error: { code: 'upstream_unavailable', message: 'Cliente de Notion aún no conectado' },
-    },
-    503,
-  );
+  try {
+    const pageId = await notionFor(c.env).createExpense(expense);
+    return c.json<ExpenseCreated>({ ok: true, pageId });
+  } catch (err) {
+    console.error('createExpense', err);
+    return c.json<ApiError>(
+      { ok: false, error: { code: 'notion_error', message: messageOf(err) } },
+      502,
+    );
+  }
 });
+
+app.delete('/api/expense/:pageId', async (c) => {
+  const parsed = pageIdSchema.safeParse(c.req.param('pageId'));
+  if (!parsed.success) {
+    return c.json<ApiError>(
+      { ok: false, error: { code: 'invalid_request', message: formatIssues(parsed.error) } },
+      400,
+    );
+  }
+
+  try {
+    await notionFor(c.env).trashPage(parsed.data);
+    return c.json<ExpenseArchived>({ ok: true, pageId: parsed.data, archived: true });
+  } catch (err) {
+    console.error('trashPage', err);
+    return c.json<ApiError>(
+      { ok: false, error: { code: 'notion_error', message: messageOf(err) } },
+      502,
+    );
+  }
+});
+
+function notionFor(env: Env): NotionClient {
+  return new NotionClient({ token: env.NOTION_TOKEN, dataSourceId: env.NOTION_DATA_SOURCE_ID });
+}
+
+function messageOf(err: unknown): string {
+  return err instanceof Error ? err.message : 'Error desconocido llamando a Notion';
+}
 
 app.notFound((c) =>
   c.json<ApiError>(
