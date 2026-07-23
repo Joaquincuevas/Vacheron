@@ -194,6 +194,60 @@ button {
   transform: translateY(-0.08em);
 }
 
+/* --------------------------------------------------------------- teclado */
+
+.keypad {
+  flex: none;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s-2);
+  padding: var(--s-3) var(--s-4) var(--s-4);
+}
+
+/* Las teclas no llevan fondo en reposo: doce cajas apiladas ensucian la
+   pantalla y compiten con el monto. El relleno aparece solo al tocar. */
+.key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 64px;
+  border-radius: var(--radius);
+  background: transparent;
+  font-size: var(--step-3);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.key:active {
+  background: var(--surface-1);
+}
+
+.key--ghost {
+  color: var(--text-dim);
+}
+
+/* La única superficie rellena de la vista: no hay duda de cuál es la acción. */
+.key--confirm {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.key--confirm:active {
+  background: var(--accent);
+}
+
+.key--confirm:disabled {
+  background: var(--surface-1);
+  color: var(--text-faint);
+  cursor: default;
+}
+
+.key--confirm:disabled:active {
+  transform: none;
+}
+
 /* ----------------------------------------------------------- superficies */
 
 .surface {
