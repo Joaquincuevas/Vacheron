@@ -1,0 +1,17 @@
+name = "vacheron-api"
+main = "worker/src/index.ts"
+compatibility_date = "2026-05-01"
+
+[observability]
+enabled = true
+
+# Origen(es) del front autorizados a llamar la API, separados por coma.
+# En producción: la URL de Cloudflare Pages (y el dominio propio si lo hay).
+[vars]
+ALLOWED_ORIGIN = "http://localhost:5173"
+
+# Secretos — NO van aquí. Se cargan con:
+#   wrangler secret put NOTION_TOKEN
+#   wrangler secret put NOTION_DATA_SOURCE_ID
+#   wrangler secret put APP_TOKEN
+# En local se leen de `.dev.vars` (ver .dev.vars.example).

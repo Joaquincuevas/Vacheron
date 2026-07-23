@@ -6,12 +6,19 @@
   "description": "Registro ultrarrápido de gastos desde el iPhone hacia Notion",
   "scripts": {
     "dev": "vite",
+    "dev:api": "wrangler dev",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit -p tsconfig.web.json"
+    "deploy:api": "wrangler deploy",
+    "typecheck": "tsc --noEmit -p tsconfig.web.json && tsc --noEmit -p tsconfig.worker.json"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260702.1",
     "typescript": "^5.7.2",
-    "vite": "^6.0.7"
+    "vite": "^6.0.7",
+    "wrangler": "^4.86.0"
+  },
+  "dependencies": {
+    "hono": "^4.12.31"
   }
 }

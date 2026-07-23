@@ -1,0 +1,16 @@
+# Secretos del Worker en desarrollo. Copiar a `.dev.vars` (ignorado por git).
+# En producción NO se usa este archivo: cada valor va con `wrangler secret put <NOMBRE>`.
+
+# Token interno de la integración de Notion (empieza con `ntn_`).
+NOTION_TOKEN=ntn_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+# ID del ORIGEN DE DATOS, no el de la base.
+# Base como página completa -> Configuración -> Administrar orígenes de datos -> ... -> Copiar ID
+NOTION_DATA_SOURCE_ID=00000000-0000-0000-0000-000000000000
+
+# Token compartido que el front manda en la cabecera X-App-Token.
+# Generar uno: openssl rand -hex 32
+APP_TOKEN=cambiame
+
+# Origen del front autorizado (coincide con [vars] de wrangler.toml).
+ALLOWED_ORIGIN=http://localhost:5173
