@@ -5,14 +5,10 @@ import type { ApiError, ExpenseArchived, ExpenseCreated } from '../../shared/typ
 import { expenseSchema, formatIssues, normalizeExpense, pageIdSchema } from './schema';
 import { NotionClient } from './notion';
 import { toAppError } from './errors';
+import { requireAppToken } from './auth';
+import type { Env } from './env';
 
-export interface Env {
-  NOTION_TOKEN: string;
-  NOTION_DATA_SOURCE_ID: string;
-  APP_TOKEN: string;
-  /** Uno o varios orígenes separados por coma. */
-  ALLOWED_ORIGIN: string;
-}
+export type { Env };
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -34,6 +30,11 @@ app.use('/api/*', (c, next) => {
     maxAge: 86_400,
   })(c, next);
 });
+
+// `/api/health` queda sin auth a propósito: sirve para verificar el deploy.
+// Todo lo que escribe en Notion exige el token compartido.
+app.use('/api/expense', requireAppToken);
+app.use('/api/expense/*', requireAppToken);
 
 app.get('/api/health', (c) => c.json({ ok: true, service: 'vacheron-api' }));
 
@@ -101,12 +102,6 @@ app.notFound((c) =>
   ),
 );
 
-app.onError((err, c) => {
-  console.error('unhandled', err);
-  return c.json<ApiError>(
-    { ok: false, error: { code: 'internal', message: 'Error interno' } },
-    500,
-  );
-});
+app.onError((err, c) => fail(c, err, 'unhandled'));
 
 export default app;
