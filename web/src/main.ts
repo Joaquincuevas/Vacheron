@@ -2,6 +2,7 @@ import './styles/app.css';
 import { getState, resetEntry, setState, subscribe } from './state';
 import { mountCategoryGrid } from './ui/categories';
 import { mountKeypad } from './ui/keypad';
+import { mountNote } from './ui/note';
 import { mountConfirmation } from './ui/confirm';
 import { toneOf, type Category } from './lib/categories';
 import { recordUse } from './lib/frequency';
@@ -25,6 +26,7 @@ const amountValue = el('amount-value');
 
 const grid = mountCategoryGrid(el('category-grid'), pickCategory);
 const confirmation = mountConfirmation(el('overlay'));
+const note = mountNote(el('note'), (value) => setState({ note: value }));
 
 const keypad = mountKeypad(el('keypad'), {
   onDigit: (digit) => setState({ amount: appendDigit(getState().amount, digit) }),
@@ -77,6 +79,7 @@ async function finish(kind: 'saved' | 'queued', amount: number, haptic: number |
   setState({ status: kind });
   vibrate(haptic);
   await confirmation.flash(kind, amount);
+  note.reset();
   grid.refresh();
   resetEntry();
 }
@@ -104,6 +107,8 @@ chipCategory.addEventListener('click', () => {
 // y hace posible probarla sin tocar la pantalla.
 window.addEventListener('keydown', (event) => {
   if (getState().view !== 'amount') return;
+  // Con la nota enfocada, el teclado físico escribe en la nota, no en el monto.
+  if (event.target instanceof HTMLInputElement) return;
 
   if (event.key >= '0' && event.key <= '9') {
     setState({ amount: appendDigit(getState().amount, Number(event.key)) });
