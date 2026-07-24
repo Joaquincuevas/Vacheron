@@ -270,6 +270,91 @@ button {
   transform: scale(0.96);
 }
 
+/* ---------------------------------------------------------- confirmación */
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.confirm {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-3);
+  background: var(--bg);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity var(--dur) var(--ease),
+    visibility var(--dur) var(--ease);
+}
+
+.confirm.is-on {
+  opacity: 1;
+  visibility: visible;
+}
+
+.confirm__mark {
+  color: var(--ok);
+}
+
+.confirm[data-kind='queued'] .confirm__mark {
+  color: var(--accent);
+}
+
+.confirm__tick {
+  stroke-dasharray: 44;
+  stroke-dashoffset: 44;
+}
+
+.confirm.is-on .confirm__tick {
+  animation: tick var(--dur) var(--ease) forwards;
+}
+
+.confirm.is-on .confirm__mark {
+  animation: pop 420ms var(--ease);
+}
+
+.confirm__amount {
+  margin: var(--s-2) 0 0;
+  font-size: var(--step-3);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+
+.confirm__note {
+  margin: 0;
+  font-size: var(--step--1);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+@keyframes tick {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.6);
+  }
+  55% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;

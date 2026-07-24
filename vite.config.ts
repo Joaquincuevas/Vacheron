@@ -3,6 +3,9 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   root: 'web',
   publicDir: 'public',
+  // El código vive en web/ pero .env y .env.example están en la raíz del repo,
+  // que es donde el README los documenta. Sin esto Vite los buscaría en web/.
+  envDir: '..',
   build: {
     outDir: '../dist',
     emptyOutDir: true,
