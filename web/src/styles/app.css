@@ -25,6 +25,10 @@ body {
   font-size: var(--step-0);
   line-height: 1.4;
   -webkit-font-smoothing: antialiased;
+  /* iOS: sin rebote elástico ni auto-zoom del texto al girar el teléfono. */
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 button {
@@ -43,6 +47,10 @@ button {
   height: 100%;
   display: flex;
   flex-direction: column;
+  /* Insets laterales: en landscape con notch el contenido no queda bajo el
+     recorte. En portrait estos valen 0 y no cambian nada. */
+  padding-left: var(--safe-l);
+  padding-right: var(--safe-r);
 }
 
 .topbar {
@@ -51,7 +59,9 @@ button {
   align-items: center;
   justify-content: space-between;
   gap: var(--s-4);
-  padding: var(--s-4) var(--s-5) var(--s-3);
+  /* La status bar translúcida deja el contenido subir hasta arriba: el inset
+     empuja el header por debajo del notch. */
+  padding: calc(var(--s-4) + var(--safe-t)) var(--s-5) var(--s-3);
 }
 
 .topbar__day {
@@ -187,7 +197,10 @@ button {
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 0 var(--s-5) var(--s-4);
+  /* -webkit-overflow-scrolling: momentum en iOS; inset inferior para que el
+     último gasto no quede bajo la barra de gestos. */
+  -webkit-overflow-scrolling: touch;
+  padding: 0 var(--s-5) calc(var(--s-4) + var(--safe-b));
 }
 
 .history__title {
@@ -386,7 +399,8 @@ button {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: var(--s-2);
-  padding: var(--s-3) var(--s-4) var(--s-4);
+  /* Inset inferior: el teclado no queda tapado por la barra de gestos del iPhone. */
+  padding: var(--s-3) var(--s-4) calc(var(--s-4) + var(--safe-b));
 }
 
 /* Las teclas no llevan fondo en reposo: doce cajas apiladas ensucian la
