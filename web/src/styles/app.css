@@ -554,6 +554,31 @@ button {
   }
 }
 
+/* Aviso de error: baja desde arriba, respeta el notch, se va solo. */
+.toast {
+  position: fixed;
+  top: calc(var(--safe-t) + var(--s-3));
+  left: 50%;
+  z-index: 20;
+  max-width: min(92vw, 420px);
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--radius);
+  background: color-mix(in oklch, var(--danger) 24%, var(--surface-3));
+  color: var(--text);
+  font-size: var(--step--1);
+  text-align: center;
+  transform: translate(-50%, -140%);
+  opacity: 0;
+  transition:
+    transform var(--dur) var(--ease),
+    opacity var(--dur) var(--ease);
+}
+
+.toast.is-on {
+  transform: translate(-50%, 0);
+  opacity: 1;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;

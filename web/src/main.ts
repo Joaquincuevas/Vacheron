@@ -4,6 +4,7 @@ import { mountCategoryGrid } from './ui/categories';
 import { mountKeypad } from './ui/keypad';
 import { mountNote } from './ui/note';
 import { mountConfirmation } from './ui/confirm';
+import { mountToast } from './ui/toast';
 import { toneOf, type Category } from './lib/categories';
 import { recordUse } from './lib/frequency';
 import { appendDigit, formatAmount, removeDigit } from './lib/money';
@@ -47,6 +48,7 @@ const dayTotal = el('day-total');
 
 const grid = mountCategoryGrid(el('category-grid'), pickCategory);
 const confirmation = mountConfirmation(el('overlay'));
+const toast = mountToast(el('app'));
 const note = mountNote(el('note'), (value) => setState({ note: value }));
 const pending = mountPendingIndicator(el('pending-slot'));
 const history = mountHistory(el('history'), undoExpense);
@@ -172,6 +174,14 @@ subscribe((state, previous) => {
 
   // La confirmación se deshabilita mientras se envía para no disparar dos veces.
   keypad.setConfirmEnabled(state.amount > 0 && state.status !== 'sending');
+
+  // El error definitivo necesita palabras; el resto de los estados no. El monto
+  // queda intacto en pantalla, así que tocar confirmar de nuevo reintenta.
+  if (state.status === 'error' && state.status !== previous.status && state.error) {
+    toast.show(state.error);
+  } else if (state.status !== 'error' && previous.status === 'error') {
+    toast.hide();
+  }
 });
 
 // Tocar el chip vuelve a elegir categoría sin perder lo tipeado.
