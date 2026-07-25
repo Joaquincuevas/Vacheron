@@ -9,6 +9,7 @@ import { recordUse } from './lib/frequency';
 import { appendDigit, formatAmount, removeDigit } from './lib/money';
 import { createExpense, ApiError } from './lib/api';
 import { vibrate, HAPTIC_SAVED, HAPTIC_QUEUED, HAPTIC_ERROR } from './lib/haptics';
+import { registerServiceWorker } from './lib/pwa';
 import type { ExpenseInput } from '../../shared/types';
 
 /** Query obligatorio: si el shell no trae el nodo, es un bug de build, no un caso a manejar. */
@@ -120,5 +121,7 @@ window.addEventListener('keydown', (event) => {
     setState({ view: 'pick' });
   }
 });
+
+registerServiceWorker();
 
 export { getState, setState, subscribe, grid };
