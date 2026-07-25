@@ -1,0 +1,20 @@
+# Cabeceras de Cloudflare Pages. Se copia tal cual a la raíz de dist/.
+
+# El service worker nunca se cachea en el borde: si queda pegado, los deploys
+# nuevos no llegan nunca. Que el navegador revalide siempre.
+/sw.js
+  Cache-Control: no-cache
+
+# Assets con hash en el nombre: inmutables, se pueden cachear para siempre.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# El shell se revalida: es la puerta a la versión nueva.
+/index.html
+  Cache-Control: no-cache
+
+# Endurecimiento básico para todo el sitio.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
