@@ -8,6 +8,14 @@ import { toneOf, type Category } from './lib/categories';
 import { recordUse } from './lib/frequency';
 import { appendDigit, formatAmount, removeDigit } from './lib/money';
 import { createExpense, ApiError } from './lib/api';
+import { enqueue } from './lib/queue';
+import {
+  configureSync,
+  flushQueue,
+  requestBackgroundSync,
+  startForegroundSync,
+} from './lib/sync';
+import { mountPendingIndicator } from './ui/pending';
 import { vibrate, HAPTIC_SAVED, HAPTIC_QUEUED, HAPTIC_ERROR } from './lib/haptics';
 import { registerServiceWorker } from './lib/pwa';
 import type { ExpenseInput } from '../../shared/types';
@@ -28,6 +36,7 @@ const amountValue = el('amount-value');
 const grid = mountCategoryGrid(el('category-grid'), pickCategory);
 const confirmation = mountConfirmation(el('overlay'));
 const note = mountNote(el('note'), (value) => setState({ note: value }));
+const pending = mountPendingIndicator(el('pending-slot'));
 
 const keypad = mountKeypad(el('keypad'), {
   onDigit: (digit) => setState({ amount: appendDigit(getState().amount, digit) }),
@@ -61,10 +70,10 @@ async function submit(): Promise<void> {
     await createExpense(input);
     await finish('saved', amount, HAPTIC_SAVED);
   } catch (err) {
-    // La cola offline entra en el commit 12. Hasta entonces, una falla de red
-    // recuperable se trata como "quedó pendiente"; el resto es error visible.
+    // Falla recuperable (red, 429, 5xx): a la cola. Se reintenta solo al volver
+    // la señal — es el caso de uso central, la calle con mala cobertura.
     if (err instanceof ApiError && err.retryable) {
-      await finish('queued', amount, HAPTIC_QUEUED);
+      await enqueueExpense(input, amount);
     } else {
       const message = err instanceof ApiError ? err.message : 'No se pudo guardar';
       vibrate(HAPTIC_ERROR);
@@ -72,6 +81,19 @@ async function submit(): Promise<void> {
     }
   } finally {
     sending = false;
+  }
+}
+
+async function enqueueExpense(input: ExpenseInput, amount: number): Promise<void> {
+  try {
+    await enqueue(input);
+    await pending.refresh();
+    void requestBackgroundSync();
+    await finish('queued', amount, HAPTIC_QUEUED);
+  } catch {
+    // Sin IndexedDB (modo privado, cuota) no hay dónde guardar: error honesto.
+    vibrate(HAPTIC_ERROR);
+    setState({ status: 'error', error: 'No se pudo guardar el gasto' });
   }
 }
 
@@ -124,4 +146,10 @@ window.addEventListener('keydown', (event) => {
 
 registerServiceWorker();
 
-export { getState, setState, subscribe, grid };
+// La cola se vacía sola: al recuperar red, al volver a la app y al abrirla.
+configureSync({
+  onChange: () => void pending.refresh(),
+});
+startForegroundSync();
+
+export { getState, setState, subscribe, grid, flushQueue };

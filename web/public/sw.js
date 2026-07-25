@@ -31,6 +31,21 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+/*
+ * Background Sync (Android/Chrome; iOS Safari no lo implementa). El token de la
+ * app solo vive en el contexto de la página, así que en vez de postear desde
+ * acá, despertamos a los clientes para que vacíen la cola ellos. Sirve cuando la
+ * PWA está viva en segundo plano; el flush en primer plano cubre el resto.
+ */
+self.addEventListener('sync', (event) => {
+  if (event.tag !== 'qe-sync') return;
+  event.waitUntil(
+    self.clients.matchAll({ includeUncontrolled: true, type: 'window' }).then((clients) => {
+      for (const client of clients) client.postMessage('qe-sync');
+    }),
+  );
+});
+
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET') return;

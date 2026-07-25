@@ -68,6 +68,39 @@ button {
   color: var(--text-dim);
 }
 
+/* Indicador de cola offline: solo visible cuando hay pendientes. */
+.pending {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-1) var(--s-3);
+  border-radius: var(--radius-pill);
+  background: var(--accent-soft);
+  font-size: var(--step--1);
+  color: var(--accent);
+}
+
+.pending__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  /* Pulso suave: comunica "en proceso" sin ser un spinner ansioso. */
+  animation: pulse 1.6s var(--ease) infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pending__dot {
+    animation: none;
+  }
+}
+
 /* El escenario ancla las dos vistas en el mismo espacio para que la
    transición sea un cambio de estado y no un salto de layout. */
 .stage {
