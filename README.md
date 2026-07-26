@@ -1,5 +1,7 @@
 # Gasto — registro ultrarrápido a Notion
 
+[![CI](https://github.com/Joaquincuevas/Vacheron/actions/workflows/ci.yml/badge.svg)](https://github.com/Joaquincuevas/Vacheron/actions/workflows/ci.yml)
+
 PWA para anotar un gasto en menos de 3 segundos desde la pantalla de inicio del
 iPhone: abrir → tocar categoría → tipear monto → listo. Sin scroll, sin login.
 Escribe directo a una base de datos de Notion a través de un Cloudflare Worker.
@@ -193,7 +195,9 @@ Se abre en pantalla completa, con ícono propio, y funciona sin red.
 
 6. **El historial vive en localStorage.** Es una vista de conveniencia del día;
    la fuente de verdad es Notion. El swipe-to-undo de un gasto ya sincronizado
-   lo **archiva** en Notion (`in_trash`), no lo borra para siempre.
+   lo **archiva** en Notion (`in_trash`), no lo borra para siempre. Un gasto
+   encolado que Notion rechaza en definitiva queda visible como "no se pudo
+   enviar" (no se pierde en silencio) y se descarta con swipe.
 
 ---
 
