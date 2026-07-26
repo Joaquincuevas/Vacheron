@@ -48,16 +48,18 @@ function renderRow(
 
   const action = document.createElement('div');
   action.className = 'hrow__action';
-  action.textContent = 'Deshacer';
+  // Un gasto fallido no está en Notion: no hay nada que "deshacer", se descarta.
+  action.textContent = entry.status === 'failed' ? 'Descartar' : 'Deshacer';
 
   const surface = document.createElement('div');
   surface.className = 'hrow__surface';
+  surface.dataset['status'] = entry.status;
   surface.style.setProperty('--row-tone', category ? toneOf(category) : 'var(--text-faint)');
   surface.innerHTML = `
     <span class="hrow__dot"></span>
     <span class="hrow__text">
       <span class="hrow__label">${escapeHtml(entry.note || entry.category)}</span>
-      <span class="hrow__cat">${escapeHtml(entry.category)}${entry.status === 'pending' ? ' · pendiente' : ''}</span>
+      <span class="hrow__cat">${escapeHtml(entry.category)}${statusSuffix(entry.status)}</span>
     </span>
     <span class="hrow__amount">${formatCLP(entry.amount)}</span>
   `;
@@ -65,6 +67,13 @@ function renderRow(
   row.append(action, surface);
   attachSwipe(surface, () => commitUndo(row, surface, entry, onUndo, rerender));
   return row;
+}
+
+/** Sufijo de estado en la línea de categoría. Lo sincronizado no lleva nada. */
+function statusSuffix(status: HistoryEntry['status']): string {
+  if (status === 'pending') return ' · pendiente';
+  if (status === 'failed') return ' · no se pudo enviar';
+  return '';
 }
 
 /** Anima la fila hacia afuera y dispara el deshacer. */

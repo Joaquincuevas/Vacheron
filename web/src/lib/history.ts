@@ -66,10 +66,14 @@ export function removeEntry(id: string): void {
   write(read().filter((e) => e.id !== id));
 }
 
-/** Gastos de hoy, del más reciente al más viejo, tope de `limit`. */
+/**
+ * Gastos de hoy, del más reciente al más viejo, tope de `limit`. Incluye los
+ * fallidos a propósito: un gasto que se encoló y después Notion rechazó no puede
+ * desaparecer en silencio — el usuario tiene que enterarse y poder descartarlo.
+ */
 export function listToday(limit = 10, today: string = todayInSantiago()): HistoryEntry[] {
   return read()
-    .filter((e) => e.date === today && e.status !== 'failed')
+    .filter((e) => e.date === today)
     .sort((a, b) => b.createdAt - a.createdAt)
     .slice(0, limit);
 }

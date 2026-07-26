@@ -287,6 +287,21 @@ button {
   color: var(--text-faint);
 }
 
+/* Fallido: el punto y la etiqueta en rojo, el monto tachado y apagado. Queda
+   claro que ese gasto NO entró, sin sacarlo de la vista. */
+.hrow__surface[data-status='failed'] .hrow__dot {
+  background: var(--danger);
+}
+
+.hrow__surface[data-status='failed'] .hrow__cat {
+  color: var(--danger);
+}
+
+.hrow__surface[data-status='failed'] .hrow__amount {
+  color: var(--text-faint);
+  text-decoration: line-through;
+}
+
 .hrow__amount {
   flex: none;
   font-size: var(--step-0);
